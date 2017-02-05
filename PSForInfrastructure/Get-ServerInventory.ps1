@@ -33,6 +33,7 @@ foreach ($server in (Get-Content $serverList))
             BiosVer         = [string]$bios.SMBIOSBIOSVersion+"."+$bios.SMBIOSMajorVersion+"."+$bios.SMBIOSMinorVersion
             BiosSerial      = [string]$bios.SerialNumber
             OSName          = [string]$os.Name.Substring(0,$os.Name.IndexOf("|") -1)
+			ServicePack     = [string]("SP {0}" -f [string]$os.ServicePackMajorVersion)
             Arch            = [string]$os.OSArchitecture
             Processors      = [string]@($procs).count
             Cores           = [string]$procs[0].NumberOfCores
@@ -58,6 +59,6 @@ foreach ($server in (Get-Content $serverList))
 }
   
 $sysCollection `
-    | select-object Server,TotMem,OSName,Arch,Processors,Cores,Manufacturer,Model,BiosDesc,BiosVer,BiosSerial,DriveA,DriveB,DriveC,DriveD,DriveE,DriveF,DriveG,DriveH,DriveI,DriveJ,DriveK,DriveL,DriveM,DriveN,DriveO,DriveP,DriveQ,DriveR,DriveS,DriveT,DriveU,DriveV,DriveW,DriveX,DriveY,DriveZ,ErrorMessage,ErrorItem `
+    | select-object Server,TotMem,OSName,ServicePack,Arch,Processors,Cores,Manufacturer,Model,BiosDesc,BiosVer,BiosSerial,DriveA,DriveB,DriveC,DriveD,DriveE,DriveF,DriveG,DriveH,DriveI,DriveJ,DriveK,DriveL,DriveM,DriveN,DriveO,DriveP,DriveQ,DriveR,DriveS,DriveT,DriveU,DriveV,DriveW,DriveX,DriveY,DriveZ,ErrorMessage,ErrorItem `
     | sort -Property Server `
     | Export-CSV -path $outputCSV -NoTypeInformation
