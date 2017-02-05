@@ -39,8 +39,19 @@ foreach ($server in (Get-Content $serverList))
             Cores           = [string]$procs[0].NumberOfCores
              
         }
-         
-        $disks | foreach-object {$si."Drive$($_.Name -replace ':', '')"="$([string]([System.Math]::Round($_.Size/1gb,2))) GB"}
+        
+		[long]$totalSize = 0 
+		[long]$totalFree = 0 
+        $disks | foreach-object {
+			$si."Drive$($_.Name -replace ':', '')"="$([string]([System.Math]::Round($_.Size/1gb,2))) GB"
+			$si."Drive$($_.Name -replace ':', '')Free"="$([string]([System.Math]::Round($_.FreeSpace/1gb,2))) GB"
+			$si."Drive$($_.Name -replace ':', '')Used"="$([string]([System.Math]::Round(($_.Size - $_.FreeSpace)/1gb,2))) GB"
+			$totalSize += $_.Size 
+			$totalFree += $_.FreeSpace
+		}
+		$si.AllDrivesSize="$([string]([System.Math]::Round($totalSize/1gb,2))) GB"
+		$si.AllDrivesFree="$([string]([System.Math]::Round($totalFree/1gb,2))) GB"
+		$si.AllDrivesUsed="$([string]([System.Math]::Round(($totalSize - $totalFree)/1gb,2))) GB"
     }
     catch [Exception]
     {
@@ -59,6 +70,6 @@ foreach ($server in (Get-Content $serverList))
 }
   
 $sysCollection `
-    | select-object Server,TotMem,OSName,ServicePack,Arch,Processors,Cores,Manufacturer,Model,BiosDesc,BiosVer,BiosSerial,DriveA,DriveB,DriveC,DriveD,DriveE,DriveF,DriveG,DriveH,DriveI,DriveJ,DriveK,DriveL,DriveM,DriveN,DriveO,DriveP,DriveQ,DriveR,DriveS,DriveT,DriveU,DriveV,DriveW,DriveX,DriveY,DriveZ,ErrorMessage,ErrorItem `
+    | select-object Server,TotMem,OSName,ServicePack,Arch,Processors,Cores,Manufacturer,Model,BiosDesc,BiosVer,BiosSerial,AllDrivesSize,AllDrivesFree,AllDrivesUsed,DriveA,DriveB,DriveC,DriveD,DriveE,DriveF,DriveG,DriveH,DriveI,DriveJ,DriveK,DriveL,DriveM,DriveN,DriveO,DriveP,DriveQ,DriveR,DriveS,DriveT,DriveU,DriveV,DriveW,DriveX,DriveY,DriveZ,DriveAFree,DriveBFree,DriveCFree,DriveDFree,DriveEFree,DriveFFree,DriveGFree,DriveHFree,DriveIFree,DriveJFree,DriveKFree,DriveLFree,DriveMFree,DriveNFree,DriveOFree,DrivePFree,DriveQFree,DriveRFree,DriveSFree,DriveTFree,DriveUFree,DriveVFree,DriveWFree,DriveXFree,DriveYFree,DriveZFree,DriveAUsed,DriveBUsed,DriveCUsed,DriveDUsed,DriveEUsed,DriveFUsed,DriveGUsed,DriveHUsed,DriveIUsed,DriveJUsed,DriveKUsed,DriveLUsed,DriveMUsed,DriveNUsed,DriveOUsed,DrivePUsed,DriveQUsed,DriveRUsed,DriveSUsed,DriveTUsed,DriveUUsed,DriveVUsed,DriveWUsed,DriveXUsed,DriveYUsed,DriveZUsed,ErrorMessage,ErrorItem `
     | sort -Property Server `
     | Export-CSV -path $outputCSV -NoTypeInformation
